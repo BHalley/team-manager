@@ -1,5 +1,7 @@
+// Dependency for inquirer npm package
 var inquirer = require("inquirer")
 
+// Constructor to create Players
 class Player {
     constructor(name, position, offense, defense) {
         this.name = name,
@@ -33,11 +35,8 @@ var playerCount = 0
 // Creating array to store player info
 var playerArray = []
 
-// Master game function
-// var teamGame = () => {
 // Queries user for player stats
 var playerQuestions = () => {
-    //Change count to 3
     if (playerCount < 3) {
         console.log("\nNEW PLAYER")
         inquirer.prompt([
@@ -54,6 +53,7 @@ var playerQuestions = () => {
                 name: "defense",
                 message: "What is your player's defense level (between 0-10)?"
             }
+        // Passes user input to constructor
         ]).then(function (answers) {
             var newPlayer = new Player(
                 answers.name,
@@ -71,28 +71,32 @@ var playerQuestions = () => {
     }
 }
 
+// Calls playerQuestions function to begin program
 playerQuestions()
 
+// Counts games played, beginning with game 1
 var gameCount = 1
+// Tracks game score
 var teamScore = 0
 
+// Function to run game
 const playGame = () => {
-    //console.log(playerArray);
     if (gameCount < 5) {
+        // Randomizes opposing team offense and defense
         var randomOffense = (Math.floor(Math.random() * 20) + 1)
         var randomDefense = (Math.floor(Math.random() * 20) + 1)
-        //console.log(playerArray)
+        // Sums user team offense and defense
         var playerOffense = playerArray[0].offense + playerArray[1].offense
         var playerDefense = playerArray[0].defense + playerArray[1].defense
+        // Adjusts game scores
         if (randomOffense < playerOffense) {
             teamScore += 1
         }
         if (randomDefense > playerDefense) {
             teamScore -= 1
         }
-        //console.log ("\nRandom Offense: " + randomOffense + " Random Defense: " + randomDefense)
-       // console.log ("\nPlayer Offense: " + playerOffense + " Player Defense: " + playerDefense)
         console.log("\nGame " + gameCount + " Score: " + teamScore)
+        // Queries user to sub in benched player
         inquirer.prompt([
             {
                 type: "confirm",
@@ -101,22 +105,23 @@ const playGame = () => {
                 default: true
             }
         ]).then(function (sub) {
-           // console.log(sub.substitute)
             if (sub.substitute) {
                 var swapPlayer = (Math.floor(Math.random() * 2))
-                //console.log("\nSwap#: " + swapPlayer)
                 var a = playerArray[swapPlayer]
                 playerArray[swapPlayer] = playerArray[2]
                 playerArray[2] = a
-                gameCount++
+                // Resets random number in swapPlayer and prints team (showing which player was swapped)
                 swapPlayer = 0
                 teamStats()
+                // Iterates game # and loops
+                gameCount++
                 playGame()
             } else {
                 gameCount++
                 playGame()
             }
         })
+    // Adjusts active player stats depending on game win or loss
     } else {
         if (teamScore > 0) {
             playerArray[0].goodGame()
@@ -131,18 +136,21 @@ const playGame = () => {
         } else {
             console.log("\nYou tied!")
         }
+        // Queries user if they would like to play again with the same team
         inquirer.prompt([
             {
                 type: "confirm",
                 name: "play",
-                message: "Would you like to play again?",
+                message: "Would you like to play your team again?",
                 default: true
             }
+        // Resets counters and calls playGame function
         ]).then(function (sub) {
             if (sub) {
                 gameCount = 0;
                 teamScore = 0;
                 playGame()
+            // Ends game
             } else {
                 console.log("\nThanks for playing!")
             }
